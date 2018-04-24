@@ -1,0 +1,77 @@
+{
+  "nodes":[
+  {
+    "name":"上海卓越睿新数码科技有限公司",
+    "group":1
+  },
+  {
+    "name":"上海卓越睿新数码科技有限公司1",
+    "group":1
+  },
+  {"name":"上海卓越睿新数码科技有限公司2",
+    "group":1
+  },
+  {
+    "name":"上海卓越睿新数码科技有限公司3",
+    "group":1
+  },
+  {
+    "name":"上海卓越睿新数码科技有限公司4",
+    "group":1
+  },
+  {
+    "name":"上海卓越睿新数码科技有限公司5",
+    "group":1
+  },
+  {
+    "name":"上海卓越睿新数码科技有限公司6",
+    "group":1
+  },
+  {
+    "name":"上海卓越睿新数码科技有限公司7",
+    "group":1
+  }
+],
+  "links": [
+    {
+      "source": 1,
+      "target": 0,
+      "value": 1
+    },
+    {
+      "source": 2,
+      "target": 0,
+      "value": 1
+    },
+    {
+      "source": 3,
+      "target": 0,
+      "value": 1
+    },
+    {
+      "source": 3,
+      "target": 2,
+      "value": 1
+    },
+    {
+      "source": 4,
+      "target": 1,
+      "value": 1
+    },
+    {
+      "source": 5,
+      "target": 0,
+      "value": 1
+    },
+    {
+      "source": 6,
+      "target": 0,
+      "value": 1
+    },
+    {
+      "source": 7,
+      "target": 0,
+      "value": 1
+    }
+    ]
+}
