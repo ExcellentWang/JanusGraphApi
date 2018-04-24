@@ -33,7 +33,36 @@ public class GremlinRepositoryTest {
     private String filename = "/home/wang/IdeaProjects/movies-java-spring-data-neo4j/src/main/resources/conf/gremlin.yaml";
 
 
+    private Map<String, String> querydict = new HashMap<String, String>();
+
     private Client client = null;
+
+    public Map<String, String> getQuerydict() {
+        querydict.put("traversal", "g = graph.traversal();");
+        //get reprensent id from janusgraph
+        querydict.put("getRepId", "g.V().where(hasLabel('representative')).values('chair_id');");
+
+        //get share holder Id from janusgraph
+        querydict.put("getShaId", "g.V().where(hasLabel('share_holder')).values('shareholder_id');");
+        //add share hold relationship
+        querydict.put("addShaRel",
+                "g.V().has('shareholder_id', Text.textContains('%s')).as('A')" +
+                        ".V().has('holder_id', Text.textContains('%s')).addE('股东').from('A');");
+        //add legal reprentative relationship
+        querydict.put("addLegRe", "g.V().has('chair_id', Text.textContains('%s')).as('A')" +
+                ".V().has('repren_id', Text.textContains('%s')).addE('法定代表人').from('A');");
+        //add chair man for janusgraph
+        querydict.put("addRep", "g = graph.traversal();" +
+                "g.addV(T.label,'representative').property('chair_name','%s')" +
+                ".property('chair_id','%s');");
+        querydict.put("", "");
+        querydict.put("", "");
+        querydict.put("", "");
+        querydict.put("", "");
+        querydict.put("", "");
+
+        return querydict;
+    }
 
     public void setClient(Client client) {
         this.client = client;
@@ -121,7 +150,7 @@ public class GremlinRepositoryTest {
 //
         List<Object> nodeList = queryMysql();
 
-        List<Object> sublist = nodeList.subList(0, 30);
+        List<Object> sublist = nodeList.subList(0, 3000);
         ArrayList<String> arrayList = new ArrayList<>();
 
         List<Result> results = null;
@@ -141,9 +170,9 @@ public class GremlinRepositoryTest {
                 str = String.format(str, CommonUtil.replaceSpecStr(datamap.get("company_n")),
                         CommonUtil.replaceSpecStr(datamap.get("company_addr")),
                         CommonUtil.replaceSpecStr(datamap.get("company_representat")),
-                        CommonUtil.replaceSpecStr(datamap.get("repren_id")),
-                        CommonUtil.replaceSpecStr(datamap.get("shareholder_id")),
-                        CommonUtil.replaceSpecStr(datamap.get("shareholder"))
+                        datamap.get("repren_id"),
+                        datamap.get("sharehold_id"),
+                        CommonUtil.replaceSpecStr(datamap.get("sharehold"))
                 );
 
                 results = client.submit(str).all().get();
@@ -157,20 +186,18 @@ public class GremlinRepositoryTest {
     //query add representative
     private List<Result> addChair() throws Exception {
         List<Object> nodeList = queryMysql();
-        List<Object> sublist = nodeList.subList(0, 30);
-        ArrayList<String> arrayList = new ArrayList<>();
-
+        List<Object> sublist = nodeList.subList(0, 3000);
 
         List<Result> results = null;
         try {
             for (Object map : sublist) {
                 Map<String, String> datamap = (Map<String, String>) map;
-                String str = "g = graph.traversal();" +
-                        "g.addV(T.label,'representative')" +
-                        ".property('chair_name','%s')" +
-                        ".property('chair_id','%s');";
+                String str = getQuerydict().get("addRep");
+                if (datamap.get("repren_id").length() < 7) {
+                    continue;
+                }
                 str = String.format(str, CommonUtil.replaceSpecStr(datamap.get("company_representat")),
-                        CommonUtil.replaceSpecStr(datamap.get("repren_id"))
+                        datamap.get("repren_id")
                 );
                 results = client.submit(str).all().get();
             }
@@ -185,7 +212,7 @@ public class GremlinRepositoryTest {
         List<Object> nodeList = queryMysql();
 
 
-        List<Object> sublist = nodeList.subList(0, 20);
+        List<Object> sublist = nodeList.subList(0, 3000);
         ArrayList<String> arrayList = new ArrayList<>();
 //        stringBuffer.append("g = graph.traversal()\n");
 
@@ -204,7 +231,7 @@ public class GremlinRepositoryTest {
                                 ".property('shareholder_id','%s')" +
                                 ".property('holder_name','%s');";
 
-                        str = String.format(str, CommonUtil.replaceSpecStr(sharehold_ids[i]), shareholds[i]);
+                        str = String.format(str, sharehold_ids[i], shareholds[i]);
 
                         results = client.submit(str).all().get();
                     }
@@ -218,49 +245,29 @@ public class GremlinRepositoryTest {
         return results;
     }
 
-    //query company and repretative
-    private String queryComReper() {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("g = graph.traversal()\n");
-        String str = "g.V().where(hasLabel('company').or().hasLabel('representative')).valueMap(true)";
-        stringBuffer.append(str);
-        return stringBuffer.toString();
-
-    }
 
     //Add relationship of reprsentative
-    private List<Object> addLagRela() throws Exception {
-        List<Object> resultslist = null;
-        String query = queryComReper();
+    private List<Result> addLagRela() throws Exception {
+        List<Result> resultslist = null;
+        String getRepId = getQuerydict().get("getRepId");
+        List<Result> dataresult = client.submit(getRepId).all().get();
 
-        List<Result> dataresult = client.submit(query).all().get();
-        List<Result> results2 = dataresult.subList(0, 20);
         try {
-            for (Result result : results2) {
-                System.out.println(result);
-                Map resultMap = (Map) result.getObject();
 
-                String str = "g = graph.traversal();" +
-                        "g.V().has('chair_id', within('%s')).as('A')" +
-                        ".V().has('repren_id', within('%s')).addE('法人').from('A');";
+            for (Result result : dataresult) {
+                Object chairId = result.getObject();
+
+                String str = getQuerydict().get("addLegRe");
                 String repren_id1 = "";
-                if (resultMap.get("repren_id") != null) {
-                    repren_id1 = resultMap.get("repren_id").toString();
-                } else if (resultMap.get("chair_id").toString() != null) {
-                    repren_id1 = resultMap.get("chair_id").toString();
+                if (chairId.toString().length() > 15) {
+                    repren_id1 = chairId.toString();
                 } else {
                     continue;
                 }
 
-                String repren_id = CommonUtil.replaceSpecStr(repren_id1);
+                String repren_id = repren_id1;
                 str = String.format(str, repren_id, repren_id);
-
-
-                try {
-                    List<Result> results = client.submit(str).all().get();
-                } catch (Exception e) {
-                    continue;
-                }
+                resultslist = client.submit(str).all().get();
             }
         } finally {
             client.close();
@@ -270,36 +277,22 @@ public class GremlinRepositoryTest {
 
     private List<Object> addShareRela() throws Exception {
         List<Object> resultslist = null;
-        String query = queryComReper();
-
-        List<Result> dataresult = client.submit(query).all().get();
-        List<Result> results2 = dataresult.subList(0, 20);
+        String query = "";
+        String getShaId = getQuerydict().get("getShaId");
+        List<Result> dataresult = client.submit(getShaId).all().get();
         try {
-            for (Result result : results2) {
-                System.out.println(result);
-                Map resultMap = (Map) result.getObject();
+            for (Result result : dataresult) {
+                Object holderId = result.getObject();
+                String str = getQuerydict().get("addShaRel");
 
-                String str = "g = graph.traversal();" +
-                        "g.V().has('shareholder_id', within('%s')).as('A')" +
-                        ".V().has('holder_id', within('%s')).addE('股东').from('A');";
-                String repren_id1 = "";
-                if (resultMap.get("repren_id") != null) {
-                    repren_id1 = resultMap.get("repren_id").toString();
-                } else if (resultMap.get("chair_id").toString() != null) {
-                    repren_id1 = resultMap.get("chair_id").toString();
+                if (holderId.toString().length() > 15) {
+                    str = String.format(str, holderId, holderId);
                 } else {
                     continue;
                 }
 
-                String repren_id = CommonUtil.replaceSpecStr(repren_id1);
-                str = String.format(str, repren_id, repren_id);
+                List<Result> results = client.submit(str).all().get();
 
-
-                try {
-                    List<Result> results = client.submit(str).all().get();
-                } catch (Exception e) {
-                    continue;
-                }
             }
         } finally {
             client.close();
@@ -310,8 +303,7 @@ public class GremlinRepositoryTest {
     //Add shareHolder relation ship
     private void addShaRela() throws Exception {
         List<Object> resultslist = null;
-        String query = queryComReper();
-
+        String query = "";
         List<Result> dataresult = client.submit(query).all().get();
         StringBuffer stringBuffer = new StringBuffer();
         List<Result> results2 = dataresult.subList(1, 200);

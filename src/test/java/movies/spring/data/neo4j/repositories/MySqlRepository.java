@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MySqlRepository {
+
     public static List<Object> queryMysql() {
 
         //声明Connection对象

@@ -6,8 +6,10 @@ import org.apache.tinkerpop.gremlin.structure.Property
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.janusgraph.core.JanusGraph
 import org.janusgraph.core.JanusGraphFactory
+import org.janusgraph.core.attribute.Text
 import org.janusgraph.core.schema.JanusGraphManagement
 import org.junit.Test
+import sun.util.resources.cldr.en.CalendarData_en_AS
 
 class test {
     def ioo(){
@@ -23,6 +25,19 @@ class test {
         println properties;
         println v;
 
+    }
+    def mytext(){
+        JanusGraph graph = JanusGraphFactory.open('/home/wang/graphbase/janusgraph-0.2.0-hadoop2/conf/janusgraph-cassandra-es.properties');
+//        JanusGraph graph = JanusGraphFactory.open('inmemory');
+        JanusGraphManagement management = graph.openManagement();
+
+        GraphTraversalSource g = graph.traversal()
+        g.V().has('shareholder_id', Text.textContains('%s')).as('A').V().has('holder_id', Text.textContains('%s')).addE('股东').from('A');
+        g.E().hasLabel("法定代表人").count()
+        g.E().hasLabel("法定代表人").drop()
+        g.V().hasLabel("company").limit(8).valueMap()
+        g.V().has("company_n",Text.textContains("司")).values()
+        g.E().groupCount()
     }
     @Test
     public void tt(){
