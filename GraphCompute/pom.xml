@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.neo4j.examples</groupId>
-    <artifactId>sdn5-movies</artifactId>
+    <artifactId>GraphCompute</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>SDN5 Movies</name>
-    <description>Demo web project for Spring Data using Spring Boot and Neo4j</description>
+    <name>GraphCompute</name>
+    <description>GraphCompute</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
