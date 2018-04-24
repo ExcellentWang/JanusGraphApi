@@ -45,22 +45,20 @@ public class MovieController {
 	}
     @GetMapping("/company")
     public String company(@RequestParam("name") String name) throws Exception {
-        CompanyService cs = new CompanyService();
-        String jsonResult =cs.CompanyDao(name);
+        CompanyService cs = new CompanyService(name);
+        String jsonResult =cs.CompanyDao();
         return jsonResult;
     }
     @GetMapping("/legalperson")
-    public Map<String, Object> legalperson(@RequestParam("name") String name) {
-        Map<String,Object> a = new HashMap<String,Object>();
-        a.put("a","bbbbbbbbbbbbbbbbbbbbb");
-        return a;
-//        return movieService.graph(limit == null ? 100 : limit);
+    public String legalperson(@RequestParam("name") String name) throws Exception {
+        CompanyService cs = new CompanyService(name);
+        String jsonResult =cs.CompanyDao();
+        return jsonResult;
     }
-    @GetMapping("/Shareholder")
-    public Map<String, Object> Shareholder(@RequestParam("name") String name) {
-        Map<String,Object> a = new HashMap<String,Object>();
-        a.put("a","bbbbbbbbbbbbbbbbbbbbb");
-        return a;
-//        return movieService.graph(limit == null ? 100 : limit);
+    @GetMapping("/shareholder")
+    public String shareholder(@RequestParam("name") String name) throws Exception{
+        CompanyService cs = new CompanyService(name);
+        String jsonResult =cs.CompanyDao();
+        return jsonResult;
     }
 }
