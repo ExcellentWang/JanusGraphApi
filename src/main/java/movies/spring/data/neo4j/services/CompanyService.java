@@ -17,9 +17,6 @@ public class CompanyService {
 
         this.companyname=name;
     }
-    public CompanyService(){
-
-    }
 
     public String CompanyDao() throws Exception {
         JSONObject jsonresult=new CompanyRepositories(this.companyname).queryCompanyData();
@@ -42,5 +39,8 @@ public class CompanyService {
         System.out.println(json);
         return json;
     }
-
+    public List<JSONObject> queryCompany() throws Exception {
+        List<JSONObject> result=new CompanyRepositories(this.companyname).queryCompanyList();
+        return result;
+    }
 }

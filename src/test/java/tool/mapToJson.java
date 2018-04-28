@@ -58,8 +58,6 @@ public class mapToJson {
 //        jsonOne1.put("nodes",ls);
 //        System.out.println(jsonOne1);
         Map<String,List>a=new HashMap<>();
-        List b= new ArrayList();
-        a.put("a",b);
-        System.out.println(a.get("a").getClass().toString());
+        System.out.println(a.get('a'));
     }
 }

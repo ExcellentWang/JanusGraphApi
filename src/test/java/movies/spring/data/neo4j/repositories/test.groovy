@@ -44,8 +44,13 @@ class test {
         ioo()
     }
     @Test
-    public void aa() throws Exception {
+    public void bb() throws Exception {
         String name="交通银行股份有限公司太平洋信用卡中心中山分中心";
+        new CompanyRepositories(name).queryCompanyList();
+    }
+    @Test
+    public void aa() throws Exception {
+        String name="firm_f6175a3dadbdd73c8e13099ea9b65b35";
         new CompanyRepositories(name).queryCompanyData();
     }
     @Test

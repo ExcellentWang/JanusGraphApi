@@ -2,11 +2,13 @@ package movies.spring.data.neo4j.controller;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import movies.spring.data.neo4j.domain.Movie;
 import movies.spring.data.neo4j.services.CompanyService;
 import movies.spring.data.neo4j.services.MovieService;
+import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,19 +46,25 @@ public class MovieController {
 		return a;
 //        return movieService.graph(limit == null ? 100 : limit);
 	}
-    @GetMapping("/company")
-    public String company(@RequestParam("name") String name) throws Exception {
+    @GetMapping("/companyList")
+    public List<JSONObject> companyLsit(@RequestParam("name") String name) throws Exception {
         CompanyService cs = new CompanyService(name);
+        List<JSONObject> result =cs.queryCompany();
+        return result;
+    }
+    @GetMapping("/companyGraph")
+    public String company(@RequestParam("ids") String ids) throws Exception {
+        CompanyService cs = new CompanyService(ids);
         String jsonResult =cs.CompanyDao();
         return jsonResult;
     }
-    @GetMapping("/legalperson")
+    @GetMapping("/legalpersonGraph")
     public String legalperson(@RequestParam("name") String name) throws Exception {
         CompanyService cs = new CompanyService(name);
         String jsonResult =cs.CompanyDao();
         return jsonResult;
     }
-    @GetMapping("/shareholder")
+    @GetMapping("/shareholderGraph")
     public String shareholder(@RequestParam("name") String name) throws Exception{
         CompanyService cs = new CompanyService(name);
         String jsonResult =cs.CompanyDao();

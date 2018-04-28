@@ -7,6 +7,7 @@ import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Result;
 import org.apache.tinkerpop.gremlin.structure.util.detached.DetachedVertex;
 
+import javax.json.JsonObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,15 +24,13 @@ public class CompanyRepositories {
         gremlinConnect gl =new gremlinConnect();
         Client client=gl.connectGremlinServer();
         String shstr ="g = graph.traversal();" +
-                "g.V().has('company_n','%s').as('a').in('ShareHolder').as('b').out('ShareHolder').as('c').select('a','b','c').by(id)";
+                "g.V().has('company_id','%s').as('a').in('ShareHolder').as('b').out('ShareHolder').as('c').select('a','b','c').by(id)";
         String str ="g = graph.traversal();" +
-                "g.V().has('company_n','%s').as('a').in('LegalRepresent').as('b').out('LegalRepresent').as('c').select('a','b','c').by(id)";
+                "g.V().has('company_id','%s').as('a').in('LegalRepresent').as('b').out('LegalRepresent').as('c').select('a','b','c').by(id)";
         shstr=String.format(shstr, this.companyname);
         str=String.format(str, this.companyname);
-        System.out.print(shstr);
-        System.out.print(str);
+        System.out.println(str);
         List<Result> results =client.submit(str).all().get();
-        System.out.println(results);
         List<Result> shresults =client.submit(shstr).all().get();
         Map<Object,Object> map2= new HashMap<Object,Object>();
         List<Map<Object,Object>> nodesml = new ArrayList<Map<Object,Object>>();
@@ -96,9 +95,12 @@ public class CompanyRepositories {
     //company map
     public Map<Object,Object> cpmap(Map<Object,Object> map,String ids){
         Map<Object,Object> nmap=new HashMap<>();
-        List<String> labl=new ArrayList<>();
+        if (map.get("company_id")==null){
+            nmap.put("lable","Person");
+        } else{
+            nmap.put("lable","Company");
+        }
         nmap.put("id",ids);
-        nmap.put("lable",labl);
         nmap.put("properties",map);
         System.out.println(nmap);
         return nmap;
@@ -110,5 +112,26 @@ public class CompanyRepositories {
         Result results =client.submit(str).all().get().get(0);
         Map<Object,Object> map = (Map<Object, Object>)results.getObject();
         return map;
+    }
+
+    public List<JSONObject> queryCompanyList() throws Exception {
+        List<JSONObject> resList = new ArrayList<JSONObject>();
+        gremlinConnect gl =new gremlinConnect();
+        Client client=gl.connectGremlinServer();
+        String str ="g = graph.traversal();" +
+                " g.V().has('company_n',textContainsRegex('.*%s.*')).valueMap()";
+        str=String.format(str, this.companyname);
+        List<Result> results =client.submit(str).all().get();
+        for (Result res :results) {
+            Map<Object, Object> map = (Map<Object, Object>) res.getObject();
+            JSONObject jsonObject = JSONObject.fromObject(map);
+//            List comids = (List) map.get("company_id");
+//            String comid= (String) comids.get(0);
+//            List comnames = (List) map.get("company_n");
+//            String comname= (String) comnames.get(0);
+//            String idname = comid +"&"+ comname;
+            resList.add(jsonObject);
+        }
+        return resList;
     }
 }
