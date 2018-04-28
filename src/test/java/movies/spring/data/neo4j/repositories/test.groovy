@@ -43,4 +43,18 @@ class test {
     public void tt(){
         ioo()
     }
+    @Test
+    public void aa() throws Exception {
+        String name="交通银行股份有限公司太平洋信用卡中心中山分中心";
+        new CompanyRepositories(name).queryCompanyData();
+    }
+    @Test
+    public void vv(){
+        Map<Object,Object> map5= new HashMap<Object,Object>();
+        if (map5.get("a")==null){
+            println "1111"
+        }
+
+
+    }
 }

@@ -1,11 +1,8 @@
 package movies.spring.data.neo4j.repositories;
-import com.thinkaurelius.titan.core.attribute.Text;
-import javafx.beans.binding.StringBinding;
 import movies.spring.data.neo4j.connect.gremlinConnect;
 import net.sf.json.JSONObject;
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Result;
-import org.apache.tinkerpop.gremlin.structure.util.detached.DetachedVertex;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class CompanyRepositories {
-    Map<Object,Object> map5= new HashMap<Object,Object>();
+public class CompanyRepositories1 {
     String companyname;
-    public CompanyRepositories(String companyname){
+    public CompanyRepositories1(String companyname){
         this.companyname=companyname;
     }
     public JSONObject queryCompanyData() throws Exception {
@@ -36,12 +32,84 @@ public class CompanyRepositories {
         Map<Object,Object> map2= new HashMap<Object,Object>();
         List<Map<Object,Object>> nodesml = new ArrayList<Map<Object,Object>>();
         List<Map<Object,Object>> rsml = new ArrayList<Map<Object,Object>>();
-        Map<String ,List<Map<Object,Object>>> fr= createJson(results,nodesml,rsml,"LegalRepresent","法人",client);
-        Map<String ,List<Map<Object,Object>>> shfr= createJson(shresults,nodesml,rsml,"ShareHolder","股东",client);
-        List<Map<Object,Object>> ff =shfr.get("r");
-        List<Map<Object,Object>> nn =shfr.get("n");
-        map2.put("nodes",nn);
-        map2.put("relationships",ff);
+        Map<Object,Object> map5= new HashMap<Object,Object>();
+        List fr= createJson(results,map5,nodesml,rsml,"LegalRepresent","法人",client);
+        List sh= createJson(shresults,map5,nodesml,rsml,"ShareHolder","股东",client);
+        fr.add(sh);
+//        for (Result result : results) {
+//            Map<Object,Object> map1= new HashMap<Object,Object>();
+//            Map<Object,Object> map3= new HashMap<Object,Object>();
+//            Map<Object,Object> result1 = (Map<Object, Object>)result.getObject();
+//            if (map5.get(result1.get("a").toString()+"LegalRepresent")==null){
+//                map5.put(result1.get("a").toString()+"LegalRepresent","1");
+//                map=queryData(result1.get("a").toString() ,client );
+//                map=cpmap(map,result1.get("a").toString());
+//                nodesml.add(map);
+//            }
+//            if (map5.get(result1.get("b").toString()+"LegalRepresent")==null){
+//                map5.put(result1.get("b").toString()+"LegalRepresent","1");
+//                map=queryData(result1.get("b").toString() ,client );
+//                map=cpmap(map,result1.get("b").toString());
+//                nodesml.add(map);
+//            }
+//            if (map5.get(result1.get("c").toString()+"LegalRepresent")==null){
+//                map5.put(result1.get("c").toString()+"LegalRepresent","1");
+//                map=queryData(result1.get("c").toString() ,client );
+//                map=cpmap(map,result1.get("c").toString());
+//                nodesml.add(map);
+//                map3.put("id",result1.get("b").toString()+result1.get("c").toString());
+//                map3.put("type","LegalRepresent");
+//                map3.put("startNode",result1.get("b").toString());
+//                map3.put("endNode",result1.get("c").toString());
+//                map3.put("properties","法人");
+//                rsml.add(map3);
+//            }
+//            map1.put("id",result1.get("a").toString()+result1.get("b").toString());
+//            map1.put("type","LegalRepresent");
+//            map1.put("startNode",result1.get("a").toString());
+//            map1.put("endNode",result1.get("b").toString());
+//            map1.put("properties","法人");
+//            rsml.add(map1);
+//
+//        }
+//        for (Result result : shresults) {
+//            Map<Object,Object> map1= new HashMap<Object,Object>();
+//            Map<Object,Object> map3= new HashMap<Object,Object>();
+//            Map<Object,Object> result1 = (Map<Object, Object>)result.getObject();
+//            if (map5.get(result1.get("a").toString()+"ShareHolder")==null){
+//                map5.put(result1.get("a").toString()+"ShareHolder","1");
+//                map=queryData(result1.get("a").toString() ,client );
+//                map=cpmap(map,result1.get("a").toString());
+//                nodesml.add(map);
+//            }
+//            if (map5.get(result1.get("b").toString()+"ShareHolder")==null){
+//                map5.put(result1.get("b").toString()+"ShareHolder","1");
+//                map=queryData(result1.get("b").toString() ,client );
+//                map=cpmap(map,result1.get("b").toString());
+//                nodesml.add(map);
+//            }
+//            if (map5.get(result1.get("c").toString()+"ShareHolder")==null){
+//                map5.put(result1.get("c").toString()+"ShareHolder","1");
+//                map=queryData(result1.get("c").toString() ,client );
+//                map=cpmap(map,result1.get("c").toString());
+//                nodesml.add(map);
+//                map3.put("id",result1.get("b").toString()+result1.get("c").toString());
+//                map3.put("type","ShareHolder");
+//                map3.put("startNode",result1.get("b").toString());
+//                map3.put("endNode",result1.get("c").toString());
+//                map3.put("properties","股东");
+//                rsml.add(map3);
+//            }
+//            map1.put("id",result1.get("a").toString()+result1.get("b").toString());
+//            map1.put("type","ShareHolder");
+//            map1.put("startNode",result1.get("a").toString());
+//            map1.put("endNode",result1.get("b").toString());
+//            map1.put("properties","股东");
+//            rsml.add(map1);
+//
+//        }
+        map2.put("nodes",nodesml);
+        map2.put("relationships",rsml);
         JSONObject jsonObject = JSONObject.fromObject(map2);
         jsonObject.put("graph",jsonObject);
         jsonObject.remove("nodes");
@@ -49,9 +117,10 @@ public class CompanyRepositories {
         System.out.println(jsonObject);
         return jsonObject;
     }
-    public Map<String ,List<Map<Object,Object>>> createJson(List<Result> shresults,
+    public List createJson(List<Result> shresults,Map<Object,Object> map5,
                            List<Map<Object,Object>> nodesml,List<Map<Object,Object>> rsml,
                            String type,String typename,Client client) throws ExecutionException, InterruptedException {
+        List a = new ArrayList();
         for (Result result : shresults) {
             Map<Object,Object> map1= new HashMap<Object,Object>();
             Map<Object,Object> map3= new HashMap<Object,Object>();
@@ -88,9 +157,8 @@ public class CompanyRepositories {
             rsml.add(map1);
 
         }
-        Map<String ,List<Map<Object,Object>>> a = new HashMap<>();
-        a.put("r",rsml);
-        a.put("n",nodesml);
+        a.add(rsml);
+        a.add(nodesml);
         return a;
     }
     //company map

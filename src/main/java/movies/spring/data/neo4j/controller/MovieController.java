@@ -7,6 +7,7 @@ import java.util.Map;
 import movies.spring.data.neo4j.domain.Movie;
 import movies.spring.data.neo4j.services.CompanyService;
 import movies.spring.data.neo4j.services.MovieService;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
