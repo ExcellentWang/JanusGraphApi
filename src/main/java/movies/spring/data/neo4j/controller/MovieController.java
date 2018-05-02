@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import movies.spring.data.neo4j.domain.Movie;
+import movies.spring.data.neo4j.repositories.CompanyRepositories;
 import movies.spring.data.neo4j.services.CompanyService;
+import movies.spring.data.neo4j.services.LegalpersonService;
 import movies.spring.data.neo4j.services.MovieService;
 import net.sf.json.JSONObject;
 import org.junit.Test;
@@ -22,6 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/")
 public class MovieController {
+    @Autowired
+    private CompanyService companyService;
+
+    @Autowired
+    private LegalpersonService legalpersonService;
 
 	private final MovieService movieService;
 	
@@ -48,26 +55,23 @@ public class MovieController {
 	}
     @GetMapping("/companyList")
     public List<JSONObject> companyLsit(@RequestParam("name") String name) throws Exception {
-        CompanyService cs = new CompanyService(name);
-        List<JSONObject> result =cs.queryCompany();
+        List<JSONObject> result =companyService.queryCompany(name);
         return result;
     }
     @GetMapping("/companyGraph")
     public String company(@RequestParam("ids") String ids) throws Exception {
-        CompanyService cs = new CompanyService(ids);
-        String jsonResult =cs.CompanyDao();
+        String jsonResult =companyService.CompanyDao(ids);
         return jsonResult;
     }
     @GetMapping("/legalpersonGraph")
     public String legalperson(@RequestParam("name") String name) throws Exception {
-        CompanyService cs = new CompanyService(name);
-        String jsonResult =cs.CompanyDao();
+        String jsonResult =legalpersonService.LegalpersonDao(name);
         return jsonResult;
     }
     @GetMapping("/shareholderGraph")
     public String shareholder(@RequestParam("name") String name) throws Exception{
-        CompanyService cs = new CompanyService(name);
-        String jsonResult =cs.CompanyDao();
+        CompanyService cs = new CompanyService();
+        String jsonResult =cs.CompanyDao(name);
         return jsonResult;
     }
 }

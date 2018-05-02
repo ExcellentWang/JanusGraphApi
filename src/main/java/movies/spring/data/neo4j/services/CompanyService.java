@@ -5,21 +5,20 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.tinkerpop.gremlin.driver.Result;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.json.Json;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+@Service
 public class CompanyService {
-    String companyname;
-    public CompanyService(String name){
+    @Autowired
+    private CompanyRepositories companyRepositories;
 
-        this.companyname=name;
-    }
-
-    public String CompanyDao() throws Exception {
-        JSONObject jsonresult=new CompanyRepositories(this.companyname).queryCompanyData();
+    public String CompanyDao(String name) throws Exception {
+        JSONObject jsonresult=companyRepositories.queryCompanyData(name);
         return jsonresult.toString();
     }
     public JSONObject  HandleJson(JSONObject jsonresult){
@@ -38,8 +37,8 @@ public class CompanyService {
         System.out.println(json);
         return json;
     }
-    public List<JSONObject> queryCompany() throws Exception {
-        List<JSONObject> result=new CompanyRepositories(this.companyname).queryCompanyList();
+    public List<JSONObject> queryCompany(String name) throws Exception {
+        List<JSONObject> result=companyRepositories.queryCompanyList(name);
         return result;
     }
 }

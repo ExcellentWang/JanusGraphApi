@@ -54,6 +54,11 @@ class test {
         new CompanyRepositories(name).queryCompanyData();
     }
     @Test
+    public void cc() throws Exception {
+        String name="pl_pa4a3f7b26687ffa46e2bad3e40e230f";
+        new LegalpersonRepositories().queryLegalpersonData(name);
+    }
+    @Test
     public void vv(){
         Map<Object,Object> map5= new HashMap<Object,Object>();
         if (map5.get("a")==null){

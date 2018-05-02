@@ -4,9 +4,11 @@ import javafx.beans.binding.StringBinding;
 import movies.spring.data.neo4j.connect.gremlinConnect;
 import net.sf.json.JSONObject;
 import org.apache.tinkerpop.gremlin.driver.Client;
+import org.apache.tinkerpop.gremlin.driver.Cluster;
 import org.apache.tinkerpop.gremlin.driver.Result;
 import org.apache.tinkerpop.gremlin.driver.ResultSet;
 import org.apache.tinkerpop.gremlin.structure.util.detached.DetachedVertex;
+import org.springframework.stereotype.Repository;
 
 import javax.json.JsonObject;
 import java.util.ArrayList;
@@ -14,31 +16,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
+@Repository
 public class CompanyRepositories {
     Map<Object,Object> map5= new HashMap<Object,Object>();
-    String companyname;
-    public CompanyRepositories(String companyname){
-        this.companyname=companyname;
+    private String filename="D:\\study\\movies-java-spring-data-neo4j_20180423\\movies-java-spring-data-neo4j\\src\\main\\resources\\conf\\gremlin.yaml";
+    Client client = null;
+    public CompanyRepositories() throws Exception {
+        Cluster cluster = Cluster.open(filename);
+        this.client = cluster.connect();
     }
-    public JSONObject queryCompanyData() throws Exception {
-        gremlinConnect gl =new gremlinConnect();
-        Client client=gl.connectGremlinServer();
-        String shstr ="g.V().has('company_id','%s').as('a').in('ShareHolder').as('b').out('ShareHolder').as('c').select('a','b','c').by(id)";
-        String str ="g.V().has('company_id','%s').as('a').in('LegalRepresent').as('b').out('LegalRepresent').as('c').select('a','b','c').by(id)";
-        String estr ="g.V().has('company_id','%s').as('a').in('Employee').as('b').out('Employee').as('c').select('a','b','c').by(id)";
-        shstr=String.format(shstr, this.companyname);
-        str=String.format(str, this.companyname);
-        System.out.println(str);
-        List<Result> results =client.submit(str).all().get();
-        List<Result> shresults =client.submit(shstr).all().get();
+//    public CompanyRepositories() throws Exception {
+//        this.client=new gremlinConnect().connectGremlinServer();
+//    }
+    public JSONObject queryCompanyData(String companyname) throws ExecutionException, InterruptedException {
+        String shstr ="g.V().hasLabel('Company').has('company_id','%s').as('a').in('ShareHolder').as('b').out().as('c').select('a','b','c').by(id).dedup()";
+        String str ="g.V().hasLabel('Company').has('company_id','%s').as('a').in('LegalRepresent').as('b').out().as('c').select('a','b','c').by(id).dedup()";
+        String estr ="g.V().hasLabel('Company').has('company_id','%s').as('a').in('Employee').as('b').out().as('c').select('a','b','c').by(id).dedup()";
+        shstr=String.format(shstr, companyname);
+        str=String.format(str, companyname);
+        estr=String.format(estr, companyname);
+        System.out.println(estr);
+        List<Result> results =this.client.submit(str).all().get();
+        List<Result> shresults =this.client.submit(shstr).all().get();
+        List<Result> eresults =this.client.submit(estr).all().get();
         Map<Object,Object> map2= new HashMap<Object,Object>();
         List<Map<Object,Object>> nodesml = new ArrayList<Map<Object,Object>>();
         List<Map<Object,Object>> rsml = new ArrayList<Map<Object,Object>>();
         Map<String ,List<Map<Object,Object>>> fr= createJson(results,nodesml,rsml,"LegalRepresent","法人",client);
         Map<String ,List<Map<Object,Object>>> shfr= createJson(shresults,nodesml,rsml,"ShareHolder","股东",client);
-        List<Map<Object,Object>> ff =shfr.get("r");
-        List<Map<Object,Object>> nn =shfr.get("n");
+        Map<String ,List<Map<Object,Object>>> mainP= createJson(eresults,nodesml,rsml,"Employee","主要人员",client);
+        List<Map<Object,Object>> ff =mainP.get("r");
+        List<Map<Object,Object>> nn =mainP.get("n");
         map2.put("nodes",nn);
         map2.put("relationships",ff);
         JSONObject jsonObject = JSONObject.fromObject(map2);
@@ -119,22 +127,18 @@ public class CompanyRepositories {
         return nmap;
     }
     public Map<Object,Object> queryData(String ids, Client client) throws ExecutionException, InterruptedException {
-        String str ="g = graph.traversal();" +
-                "g.V(%s).valueMap()";
+        String str ="g.V(%s).valueMap()";
         str=String.format(str, ids);
         Result results =client.submit(str).all().get().get(0);
         Map<Object,Object> map = (Map<Object, Object>)results.getObject();
         return map;
     }
 
-    public List<JSONObject> queryCompanyList() throws Exception {
+    public List<JSONObject> queryCompanyList(String companyname) throws Exception {
         List<JSONObject> resList = new ArrayList<JSONObject>();
-        gremlinConnect gl =new gremlinConnect();
-        Client client=gl.connectGremlinServer();
-        String str ="g = graph.traversal();" +
-                " g.V().has('company_n',textContainsRegex('.*%s.*')).valueMap()";
-        str=String.format(str, this.companyname);
-        List<Result> results =client.submit(str).all().get();
+        String str ="g.V().hasLabel('Company').has('company_n',textContainsRegex('.*%s.*')).valueMap()";
+        str=String.format(str, companyname);
+        List<Result> results =this.client.submit(str).all().get();
         for (Result res :results) {
             Map<Object, Object> map = (Map<Object, Object>) res.getObject();
             if (map.get("person_id")==null){
