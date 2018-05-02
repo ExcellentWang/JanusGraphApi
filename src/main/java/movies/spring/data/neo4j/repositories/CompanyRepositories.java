@@ -5,6 +5,7 @@ import movies.spring.data.neo4j.connect.gremlinConnect;
 import net.sf.json.JSONObject;
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Result;
+import org.apache.tinkerpop.gremlin.driver.ResultSet;
 import org.apache.tinkerpop.gremlin.structure.util.detached.DetachedVertex;
 
 import javax.json.JsonObject;
@@ -23,10 +24,9 @@ public class CompanyRepositories {
     public JSONObject queryCompanyData() throws Exception {
         gremlinConnect gl =new gremlinConnect();
         Client client=gl.connectGremlinServer();
-        String shstr ="g = graph.traversal();" +
-                "g.V().has('company_id','%s').as('a').in('ShareHolder').as('b').out('ShareHolder').as('c').select('a','b','c').by(id)";
-        String str ="g = graph.traversal();" +
-                "g.V().has('company_id','%s').as('a').in('LegalRepresent').as('b').out('LegalRepresent').as('c').select('a','b','c').by(id)";
+        String shstr ="g.V().has('company_id','%s').as('a').in('ShareHolder').as('b').out('ShareHolder').as('c').select('a','b','c').by(id)";
+        String str ="g.V().has('company_id','%s').as('a').in('LegalRepresent').as('b').out('LegalRepresent').as('c').select('a','b','c').by(id)";
+        String estr ="g.V().has('company_id','%s').as('a').in('Employee').as('b').out('Employee').as('c').select('a','b','c').by(id)";
         shstr=String.format(shstr, this.companyname);
         str=String.format(str, this.companyname);
         System.out.println(str);
@@ -95,10 +95,23 @@ public class CompanyRepositories {
     //company map
     public Map<Object,Object> cpmap(Map<Object,Object> map,String ids){
         Map<Object,Object> nmap=new HashMap<>();
+        if (map.get("person_id")==null){
+            List ids1 = (List) map.get("company_id");
+            List name1 =(List) map.get("company_n");
+            String id= (String) ids1.get(0);
+            map.put("keyNo",id);
+            map.put("name",name1.get(0));
+        }else{
+            List comids = (List) map.get("person_id");
+            List name1 =(List) map.get("person_name");
+            String comid= (String) comids.get(0);
+            map.put("keyNo",comid);
+            map.put("name",name1.get(0));
+        }
         if (map.get("company_id")==null){
-            nmap.put("lable","Person");
+            nmap.put("label","Person");
         } else{
-            nmap.put("lable","Company");
+            nmap.put("label","Company");
         }
         nmap.put("id",ids);
         nmap.put("properties",map);
@@ -124,6 +137,19 @@ public class CompanyRepositories {
         List<Result> results =client.submit(str).all().get();
         for (Result res :results) {
             Map<Object, Object> map = (Map<Object, Object>) res.getObject();
+            if (map.get("person_id")==null){
+                List ids1 = (List) map.get("company_id");
+                List name1 =(List) map.get("company_n");
+//                String id= (String) ids1.get(0);
+                map.put("keyNo",ids1.get(0));
+                map.put("name",name1.get(0));
+            }else{
+                List ids1 = (List) map.get("person_id");
+                List name1 =(List) map.get("person_name");
+//                String comid= (String) comids.get(0);
+                map.put("keyNo",ids1.get(0));
+                map.put("name",name1.get(0));
+            }
             JSONObject jsonObject = JSONObject.fromObject(map);
 //            List comids = (List) map.get("company_id");
 //            String comid= (String) comids.get(0);

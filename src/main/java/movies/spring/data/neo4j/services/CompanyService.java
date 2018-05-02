@@ -20,8 +20,7 @@ public class CompanyService {
 
     public String CompanyDao() throws Exception {
         JSONObject jsonresult=new CompanyRepositories(this.companyname).queryCompanyData();
-        JSONObject jsonR=HandleJson(jsonresult);
-        return jsonR.toString();
+        return jsonresult.toString();
     }
     public JSONObject  HandleJson(JSONObject jsonresult){
         List<JSONObject> jsonList= (List<JSONObject>) jsonresult.get("nodes");
