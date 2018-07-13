@@ -1,0 +1,25 @@
+
+  {
+    "dbBase": "",
+    "dbHost": "",
+    "dbUser": "",
+    "dbPass": "",
+    "dbPort": "",
+    "tableName": "companyInfo",
+    "fromColumn":"cid",
+    "toColumn":"pid",
+    "fromV": {
+      "label": "company",
+      "property": "company_id"
+    },
+    "toV": {
+      "label": "person",
+      "property": "person_id"
+    },
+    "edgeLabel": "shareholder",
+    "property": [
+      "radio",
+      "",
+      ""
+    ]
+  }

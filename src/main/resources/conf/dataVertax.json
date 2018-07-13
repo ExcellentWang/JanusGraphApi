@@ -1,0 +1,33 @@
+
+  {
+    "dbBase": "",
+    "dbHost": "",
+    "dbUser": "",
+    "dbPass": "",
+    "dbPort": "",
+    "tableName": "qcc_company_info",
+    "vertaxname": "company_n",
+    "label": "company",
+    "property": [
+      "company_id",
+      "company_n",
+      "company_url",
+      "spdierTime",
+      "companyAdd",
+      "company_t",
+      "company_m",
+      "company_i",
+      "registered_capital",
+      "paid_capital",
+      "operating_state",
+      "establishment",
+      "registration",
+      "organization_code",
+      "taxpayer_code",
+      "credit_code"
+    ],
+    "index": [
+      "company_id",
+      "company_n"
+    ]
+  }
